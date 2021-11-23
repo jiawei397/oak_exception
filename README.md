@@ -7,7 +7,7 @@ A global exception filter middleware by oak.
 ## Example
 
 ```typescript
-import { anyExceptionFilter } from "https://deno.land/x/oak_exception@v0.0.2/mod.ts";
+import { anyExceptionFilter } from "https://deno.land/x/oak_exception@v0.0.3/mod.ts";
 import { Application } from "https://deno.land/x/oak@v10.0.0/mod.ts";
 
 const app = new Application();

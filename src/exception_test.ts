@@ -1,6 +1,6 @@
 // Copyright 2020 the oak authors. All rights reserved. MIT license.
 
-import { Context } from "./types.ts";
+import type { Context } from "./types.ts";
 import {
   assert,
   assertEquals,

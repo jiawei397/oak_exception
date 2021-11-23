@@ -1,5 +1,5 @@
 // Copyright 2021 the oak authors. All rights reserved. MIT license.
-import { Context, Logger, Middleware } from "./types.ts";
+import type { Context, Logger, Middleware } from "./types.ts";
 
 /** A middleware that will deal the exceptions when called, and set the response time for other middleware in
  * milliseconds as `X-Response-Time` which can be used for diagnostics and other

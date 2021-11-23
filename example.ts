@@ -6,9 +6,9 @@ app.use(anyExceptionFilter());
 
 // other middleware
 
-app.use((ctx) => {
+app.use((_ctx) => {
   throw new Error("500");
-  ctx.response.body = "Hello World!";
+  // ctx.response.body = "Hello World!";
 });
 
 console.log("app started with: http://localhost");

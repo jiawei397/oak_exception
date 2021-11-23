@@ -10,11 +10,6 @@ export interface Logger {
   debug: MsgCallback;
 }
 
-export interface Context {
-  request: Request;
-  response: Response;
-}
-
 export interface Request {
   headers: Headers;
   [x: string]: any;
@@ -23,6 +18,11 @@ export interface Request {
 export interface Response {
   headers: Headers;
   [x: string]: any;
+}
+
+export interface Context {
+  request: Request;
+  response: Response;
 }
 
 export type Middleware = (

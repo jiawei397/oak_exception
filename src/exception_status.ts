@@ -95,7 +95,7 @@ export class NotFoundException extends HttpException {
   }
 }
 
-// 404
+// 403
 export class ForbiddenException extends HttpException {
   constructor(
     objectOrError: any,
@@ -133,5 +133,22 @@ export class BadRequestException extends HttpException {
 export class BodyParamValidationException extends BadRequestException {
   constructor(objectOrError: any, description = "params not valid") {
     super(objectOrError, description);
+  }
+}
+
+// 502
+export class BadGatewayException extends HttpException {
+  constructor(
+    objectOrError: any,
+    description = STATUS_TEXT.get(Status.BadGateway),
+  ) {
+    super(
+      HttpException.createBody(
+        objectOrError,
+        description!,
+        Status.BadGateway,
+      ),
+      Status.BadGateway,
+    );
   }
 }

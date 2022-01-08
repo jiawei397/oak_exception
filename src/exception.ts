@@ -52,7 +52,7 @@ export const anyExceptionFilter = (options: {
       ctx.response.body = err.message || err;
       logger.error(
         "anyExceptionFilter",
-        isLogCompleteError ? err : ctx.response.body,
+        isLogCompleteError ? (err.stack || err) : ctx.response.body,
       );
     } finally {
       const ms = Date.now() - start;

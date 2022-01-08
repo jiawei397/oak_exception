@@ -25,9 +25,14 @@ export const anyExceptionFilter = (options: {
   logger?: Logger;
   isHeaderResponseTime?: boolean;
   isDisableFormat404?: boolean;
+  isLogCompleteError?: boolean;
 } = {}) => {
-  const { logger = console, isHeaderResponseTime, isDisableFormat404 } =
-    options;
+  const {
+    logger = console,
+    isHeaderResponseTime,
+    isDisableFormat404,
+    isLogCompleteError,
+  } = options;
   const middleware: Middleware = async function (
     ctx: Context,
     next: () => Promise<unknown>,
@@ -43,9 +48,12 @@ export const anyExceptionFilter = (options: {
         }
       }
     } catch (err) {
-      logger.error("anyExceptionFilter", err);
       ctx.response.status = err.status || 500;
-      ctx.response.body = err.message;
+      ctx.response.body = err.message || err;
+      logger.error(
+        "anyExceptionFilter",
+        isLogCompleteError ? err : ctx.response.body,
+      );
     } finally {
       const ms = Date.now() - start;
       logger.debug(

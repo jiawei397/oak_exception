@@ -41,13 +41,14 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
       if (!isDisableFormat404) {
         if (ctx.response.body === undefined && ctx.response.status === 404) {
           ctx.response.body = options.messageOf404 ??
-            options.get404Body?.(ctx) ?? get404Message();
+            await options.get404Body?.(ctx) ?? get404Message();
           ctx.response.status = 404; // TODO 这里需要重新赋一下，否则状态码变成200了
         }
       }
     } catch (err) {
       ctx.response.status = err.status || defaultErrorStatus;
-      ctx.response.body = getErrorBody?.(err, ctx) ?? (err.message || err);
+      ctx.response.body = await getErrorBody?.(err, ctx) ??
+        (err.message || err);
       logger.error(
         "anyExceptionFilter",
         isLogCompleteError ? (err.stack || err) : ctx.response.body,

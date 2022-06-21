@@ -156,6 +156,25 @@ describe("status", () => {
     assertEquals(mockContext.response.body, "self message");
   });
 
+  it("404 use self message function with Promise", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+        status: 404,
+      },
+      request: {
+        method: "GET",
+        url: "https://www.baidu.com/404",
+      },
+    } as unknown as Context;
+
+    await anyExceptionFilter({
+      get404Body: () => Promise.resolve("self message"),
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.status, 404);
+    assertEquals(mockContext.response.body, "self message");
+  });
+
   it("400", async () => {
     mockContext = {
       response: {
@@ -273,6 +292,35 @@ describe("status", () => {
     await anyExceptionFilter({
       getErrorBody() {
         return "self error";
+      },
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.body, "self error");
+  });
+
+  it("next error with status and self message with Promise", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+      },
+      request: {
+        method: "POST",
+        url: "https://www.baidu.com/501",
+      },
+    } as unknown as Context;
+
+    mockNext = () => {
+      return new Promise<void>((_resolve, reject) => {
+        setTimeout(() => {
+          reject({
+            msg: "error message",
+          });
+        }, 0);
+      });
+    };
+
+    await anyExceptionFilter({
+      getErrorBody() {
+        return Promise.resolve("self error");
       },
     })(mockContext, mockNext);
     assertEquals(mockContext.response.body, "self error");

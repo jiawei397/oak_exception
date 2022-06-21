@@ -35,8 +35,8 @@ export type ExceptionOptions = {
   isHeaderResponseTime?: boolean;
   isDisableFormat404?: boolean;
   isLogCompleteError?: boolean;
-  get404Body?: (context: Context) => string;
+  get404Body?: (context: Context) => string | Promise<string>;
   messageOf404?: string;
-  getErrorBody?: (err: Error, context: Context) => string;
+  getErrorBody?: (err: Error, context: Context) => string | Promise<string>;
   defaultErrorStatus?: number;
 };

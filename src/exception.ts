@@ -1,5 +1,5 @@
 // Copyright 2021 the oak authors. All rights reserved. MIT license.
-import type { Context, Logger, Middleware } from "./types.ts";
+import type { Context, ExceptionOptions, Middleware } from "./types.ts";
 
 /** A middleware that will deal the exceptions when called, and set the response time for other middleware in
  * milliseconds as `X-Response-Time` which can be used for diagnostics and other
@@ -21,17 +21,14 @@ import type { Context, Logger, Middleware } from "./types.ts";
  * await app.listen(":80");
  * ```
  */
-export const anyExceptionFilter = (options: {
-  logger?: Logger;
-  isHeaderResponseTime?: boolean;
-  isDisableFormat404?: boolean;
-  isLogCompleteError?: boolean;
-} = {}) => {
+export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
   const {
     logger = console,
     isHeaderResponseTime,
     isDisableFormat404,
     isLogCompleteError,
+    getErrorBody,
+    defaultErrorStatus = 500,
   } = options;
   const middleware: Middleware = async function (
     ctx: Context,
@@ -43,13 +40,14 @@ export const anyExceptionFilter = (options: {
       // 在这里可以很方便地拦截处理响应给前台的数据
       if (!isDisableFormat404) {
         if (ctx.response.body === undefined && ctx.response.status === 404) {
-          ctx.response.body = get404Message();
+          ctx.response.body = options.messageOf404 ??
+            options.get404Body?.(ctx) ?? get404Message();
           ctx.response.status = 404; // TODO 这里需要重新赋一下，否则状态码变成200了
         }
       }
     } catch (err) {
-      ctx.response.status = err.status || 500;
-      ctx.response.body = err.message || err;
+      ctx.response.status = err.status || defaultErrorStatus;
+      ctx.response.body = getErrorBody?.(err, ctx) ?? (err.message || err);
       logger.error(
         "anyExceptionFilter",
         isLogCompleteError ? (err.stack || err) : ctx.response.body,

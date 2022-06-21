@@ -29,3 +29,14 @@ export type Middleware = (
   ctx: Context,
   next: () => Promise<unknown>,
 ) => Promise<unknown>;
+
+export type ExceptionOptions = {
+  logger?: Logger;
+  isHeaderResponseTime?: boolean;
+  isDisableFormat404?: boolean;
+  isLogCompleteError?: boolean;
+  get404Body?: (context: Context) => string;
+  messageOf404?: string;
+  getErrorBody?: (err: Error, context: Context) => string;
+  defaultErrorStatus?: number;
+};

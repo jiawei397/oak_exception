@@ -118,6 +118,44 @@ describe("status", () => {
     assertEquals(mockContext.response.body, "test");
   });
 
+  it("404 use self message", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+        status: 404,
+      },
+      request: {
+        method: "GET",
+        url: "https://www.baidu.com/404",
+      },
+    } as unknown as Context;
+
+    await anyExceptionFilter({
+      messageOf404: "self message",
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.status, 404);
+    assertEquals(mockContext.response.body, "self message");
+  });
+
+  it("404 use self message function", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+        status: 404,
+      },
+      request: {
+        method: "GET",
+        url: "https://www.baidu.com/404",
+      },
+    } as unknown as Context;
+
+    await anyExceptionFilter({
+      get404Body: () => "self message",
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.status, 404);
+    assertEquals(mockContext.response.body, "self message");
+  });
+
   it("400", async () => {
     mockContext = {
       response: {
@@ -183,5 +221,60 @@ describe("status", () => {
 
     await anyExceptionFilter()(mockContext, mockNext);
     assertEquals(mockContext.response.status, 500);
+  });
+
+  it("next error without status but set default status", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+        status: 501,
+      },
+      request: {
+        method: "POST",
+        url: "https://www.baidu.com/501",
+      },
+    } as unknown as Context;
+
+    mockNext = () => {
+      return new Promise<void>((_resolve, reject) => {
+        setTimeout(() => {
+          reject("error");
+        }, 0);
+      });
+    };
+
+    await anyExceptionFilter({
+      defaultErrorStatus: 400,
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.status, 400);
+  });
+
+  it("next error with status and self message", async () => {
+    mockContext = {
+      response: {
+        headers: new Headers(),
+      },
+      request: {
+        method: "POST",
+        url: "https://www.baidu.com/501",
+      },
+    } as unknown as Context;
+
+    mockNext = () => {
+      return new Promise<void>((_resolve, reject) => {
+        setTimeout(() => {
+          reject({
+            msg: "error message",
+          });
+        }, 0);
+      });
+    };
+
+    await anyExceptionFilter({
+      getErrorBody() {
+        return "self error";
+      },
+    })(mockContext, mockNext);
+    assertEquals(mockContext.response.body, "self error");
   });
 });

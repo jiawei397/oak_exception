@@ -1,5 +1,4 @@
 // deno-lint-ignore-file no-explicit-any
-
 export type MsgCallback = (...msg: unknown[]) => unknown;
 
 export interface Logger {
@@ -23,6 +22,7 @@ export interface Response {
 export interface Context {
   request: Request;
   response: Response;
+  state: Record<string | number | symbol, any>;
 }
 
 export type Middleware = (
@@ -37,6 +37,9 @@ export type ExceptionOptions = {
   isLogCompleteError?: boolean;
   get404Body?: (context: Context) => string | Promise<string>;
   messageOf404?: string;
-  getErrorBody?: (err: Error, context: Context) => string | Promise<string>;
+  getErrorBody?: (
+    err: Error & { status?: number },
+    context: Context,
+  ) => string | Promise<string>;
   defaultErrorStatus?: number;
 };

@@ -28,12 +28,16 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
     isDisableFormat404,
     isLogCompleteError,
     getErrorBody,
+    filter,
     defaultErrorStatus = 500,
   } = options;
   const middleware: Middleware = async function (
     ctx: Context,
     next: () => Promise<unknown>,
   ) {
+    if (filter?.(ctx)) {
+      return next();
+    }
     const start = Date.now();
     try {
       await next();

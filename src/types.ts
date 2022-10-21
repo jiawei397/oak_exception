@@ -45,4 +45,8 @@ export type ExceptionOptions = {
     context: Context,
   ) => string | Promise<string>;
   defaultErrorStatus?: number;
+  /** if return true, then this error response log will be ignored */
+  ignoreResponseLog?: (context: Context) => boolean;
+  /** if true, then 401 response will be ignored to log */
+  isIngoreLog401?: boolean;
 };

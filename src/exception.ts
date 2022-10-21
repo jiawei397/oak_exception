@@ -31,6 +31,8 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
     filter,
     defaultErrorStatus = 500,
     logLevel = "info",
+    isIngoreLog401,
+    ignoreResponseLog,
   } = options;
   const middleware: Middleware = async function (
     ctx: Context,
@@ -54,10 +56,17 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
       ctx.response.status = err.status || defaultErrorStatus;
       ctx.response.body = await getErrorBody?.(err, ctx) ??
         (err.message || err);
-      logger.error(
-        "anyExceptionFilter",
-        isLogCompleteError ? (err.stack || err) : ctx.response.body,
-      );
+      if (
+        (isIngoreLog401 && ctx.response.status === 401) ||
+        (ignoreResponseLog?.(ctx))
+      ) {
+        // console.log("this response log be ignored");
+      } else {
+        logger.error(
+          "anyExceptionFilter",
+          isLogCompleteError ? (err.stack || err) : ctx.response.body,
+        );
+      }
     } finally {
       const time = Date.now() - start;
       const msg =

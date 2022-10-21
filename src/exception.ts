@@ -30,6 +30,7 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
     getErrorBody,
     filter,
     defaultErrorStatus = 500,
+    logLevel = "info",
   } = options;
   const middleware: Middleware = async function (
     ctx: Context,
@@ -58,12 +59,12 @@ export const anyExceptionFilter = (options: ExceptionOptions = {}) => {
         isLogCompleteError ? (err.stack || err) : ctx.response.body,
       );
     } finally {
-      const ms = Date.now() - start;
-      logger.debug(
-        `${ctx.request.method} ${ctx.request.url} [${ctx.response.status}] - ${ms}ms`,
-      );
+      const time = Date.now() - start;
+      const msg =
+        `${ctx.request.method} ${ctx.request.url} [${ctx.response.status}] - ${time}ms`;
+      logger[logLevel](msg);
       if (isHeaderResponseTime) {
-        ctx.response.headers.set("X-Response-Time", `${ms}ms`);
+        ctx.response.headers.set("X-Response-Time", `${time}ms`);
       }
     }
   };
